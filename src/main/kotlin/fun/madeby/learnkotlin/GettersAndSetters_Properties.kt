@@ -2,26 +2,28 @@
 package `fun`.madeby.learnkotlin
 
 
-class Player {
+class PlayerA {
     private var health = 150
-    private var alive = true
+        set(value) {
+            println("setter block")
+            var newHealth = value
+            if (value <= 0) {
+                newHealth = 0
+            }
+            field = newHealth // field keyword translates to health field
+        }
+
+    // Properties are data oriented, and do not apply side effects, I have never found a definition before!
+    val alive get() = health > 0
 
     fun reduceHealth(amount: Int) {
-        setHealth(health - amount)
+       health -= amount
     }
 
-    private fun setHealth(amount: Int) {
-        if (amount < 0) {
-            health = 0
-            alive = false
-        } else
-            health = amount
-    }
 
     fun respawn() {
         if (!alive) {
-            alive = true
-            setHealth(150)
+            health = 150
             return
         }
         println("Player is not dead!")
@@ -32,13 +34,14 @@ class Player {
 
 fun main() {
 
-    var player = Player()
+    var player = PlayerA()
     player.respawn()
     player.status()
     player.reduceHealth(175)
     player.status()
     player.respawn()
     player.status()
+    println(player.alive)
     
 
 
