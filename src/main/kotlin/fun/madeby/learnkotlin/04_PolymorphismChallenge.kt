@@ -40,7 +40,7 @@ open class SuperEnemy(health: Int, var damage: Int, var weapon: String, var relo
 }
 
 class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", false, 1) {
-    var armor = 25
+    var armor = 10
 
     init {
         println("SubPikeman init()")
@@ -48,29 +48,23 @@ class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", false
     }
 
     override fun takeDamage(damageToTake: Int) {
-        var carriedOver = 0
-        var printHealth = this.health
         var activeHealth = this.armor + this.health
+        var origHealth = this.health
+        var origArmor = this.armor
         var adjustedHealth = activeHealth - damageToTake
 
-        println("pikeman current health =  $printHealth")
-        if (armorActive) {
-            armor -= damageToTake
-            if (armor < 0) {
-                carriedOver = 0 - armor
-                this.armor = 0
-            }
-        }
-
-        if (carriedOver != 0) {
-            println("Armour depleted removed carried over as health: $carriedOver")
-        }
-        health -= if (carriedOver != 0) {
-            -carriedOver
+        println("pre ${this.health}, ${this.armor}")
+        // if armor took damage
+        if (adjustedHealth >= origHealth) {
+            this.armor -= damageToTake
+            println("armour existed post ${this.health}, ${this.armor}")
             return
+        } else {
+            this.armor = 0
+            this.health -= damageToTake - origArmor
         }
-        else
-            damageToTake
+        println("armour depleted post ${this.health}, ${this.armor}")
+
 
     }
 }
