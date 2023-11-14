@@ -25,18 +25,23 @@ open class SuperEnemy(health: Int, var damage: Int, var weapon: String, attacks:
         this.attacks = attacks
     }
 
-    fun attack(enemy : SuperEnemy) {
+    fun attack(enemy : SuperEnemy): Int {
         println("Attacking $attacks times with $weapon")
+        var remainingAttackActions = attacks
 
         for(i in 1.. attacks) {
-            println("attacking")
+            println("attacking, remaining attacks = $remainingAttackActions")
             if (enemy.alive) {
                 enemy.takeDamage(this.damage)
                 println("Enemy taking ${this.damage}")
+                remainingAttackActions--
+            }
+            if (!enemy.alive) {
+                println("You killed the enemy")
+                return remainingAttackActions
             }
         }
-        if (!enemy.alive)
-            println("You killed the enemy")
+        return 0
     }
 
     open fun takeDamage(damageToTake: Int) {
@@ -91,7 +96,7 @@ class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", 1, -1
     }
 
 fun main() {
-    var pikeman: SuperEnemy = SubPikeman(25, 24)
+    var pikeman: SuperEnemy = SubPikeman(10, 0)
     var pistolero: SuperEnemy = Pistolero(25)
     var bowman : SuperEnemy = SubBowman(25)
 
@@ -101,9 +106,12 @@ fun main() {
         pikeman.attack(pistolero)
         println(pistolero.health)
     }*/
+
+    var count = 1
     while (pikeman.alive) {
-       pistolero.attack(pikeman)
+       println("Remaining attacks after attack $count by Pistolero on Pikeman: ${pistolero.attack(pikeman)}")
        println(pikeman.health)
+       count++
     }
 
     //pikeman.attack(bowman)
