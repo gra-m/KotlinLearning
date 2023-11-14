@@ -1,8 +1,11 @@
 //Created by Graham Duthie on 13/11/2023 12:26 -1h
 package `fun`.madeby.learnkotlin
 
-open class SuperEnemy(health: Int, var damage: Int, var weapon: String, var reloadable: Boolean, attacks: Int) {
-    var attacks = 0;
+open class SuperEnemy(health: Int, var damage: Int, var weapon: String, attacks: Int, ammo: Int) {
+    var attacks = 0
+    // ammo is a limit to the number of attacks before a reload is required set to -15 for non ammo using
+    // characters to provide flexibility for specials.
+    var ammo = 0
     var health = 0
         set(value) {
             field = value // as in health field
@@ -10,17 +13,20 @@ open class SuperEnemy(health: Int, var damage: Int, var weapon: String, var relo
                 field = 0
         }
     var alive get() = health > 0
+    var isRanged get() = ammo > -1
 
 
     init{
         println("SuperEnemy init()")
         this.health = health
         this.alive = true
+        this.ammo = ammo
+        this.isRanged = ammo > -1
         this.attacks = attacks
     }
 
     fun attack(enemy : SuperEnemy) {
-        println("Attacking $attacks times")
+        println("Attacking $attacks times with $weapon")
 
         for(i in 1.. attacks) {
             println("attacking")
@@ -39,7 +45,7 @@ open class SuperEnemy(health: Int, var damage: Int, var weapon: String, var relo
     }
 }
 
-class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", false, 1) {
+class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", 1, -15) {
     var armor = 10
 
     init {
@@ -69,14 +75,14 @@ class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", false
     }
 }
 
-    class SubBowman(health: Int) : SuperEnemy(health, 5, "bow", true, 5) {
+    class SubBowman(health: Int) : SuperEnemy(health, 5, "bow", 5, 5, ) {
 
         init {
             println("SubBowman init()")
         }
 
     }
-    class Pistolero(health: Int) : SuperEnemy(health, 6, "pistol", true, 6) {
+    class Pistolero(health: Int) : SuperEnemy(health, 6, "pistol", 6, 6) {
 
         init {
             println("Pistolero init()")
@@ -85,7 +91,7 @@ class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", false
     }
 
 fun main() {
-    var pikeman: SuperEnemy = SubPikeman(25, 10)
+    var pikeman: SuperEnemy = SubPikeman(25, 24)
     var pistolero: SuperEnemy = Pistolero(25)
     var bowman : SuperEnemy = SubBowman(25)
 
