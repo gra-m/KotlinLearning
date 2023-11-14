@@ -15,6 +15,8 @@ abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, att
             field = value // as in health field
             if (field < 0)
                 field = 0
+            if (field > 100)
+                field = 100
         }
     var alive get() = health > 0
     var isRanged get() = ammo > -1
@@ -124,7 +126,8 @@ class SubPikeman1(health: Int, armor: Int) : SuperEnemy1(health, 15, "pike", 1, 
         }
 
         override fun heal(amount: Int) {
-            TODO("Not yet implemented")
+            if (amount > 0)
+                this.health += amount
         }
 
     }
@@ -136,11 +139,6 @@ fun main() {
 
     println(pistolero1.alive)
 
-/*    while (pistolero.alive) {
-        pikeman.attack(pistolero)
-        println(pistolero.health)
-    }*/
-
     var count = 1
     while (pikeman.alive) {
        println("REPORT: Remaining attacks after attack $count by Pistolero on Pikeman: ${pistolero1.attack(pikeman)}")
@@ -148,6 +146,15 @@ fun main() {
        count++
     }
 
-    //pikeman.attack(bowman)
+    // Manual casting of Pistolero1 so heal:
+    if (pistolero1 is Healable) {
+        // smart casting
+        pistolero1.heal(20)
+        // manual casting
+        val healable = pistolero1 as Healable
+        healable.heal(10)
+        println("pistolero1 health = ${pistolero1.health}")
+    }
+
 
 }
