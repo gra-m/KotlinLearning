@@ -57,8 +57,8 @@ abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, att
         for(i in 1.. attacksThisRound) {
             println("attacking, remaining attacks = $remainingAttackActions")
             if (enemy.alive && ammo > 0) {
-                var modifiedDamage = modifyDamage(damage, enemy.enemyClassType)
-                enemy.takeDamage(this.damage)
+                val modifiedDamage = modifyDamage(damage, enemy.enemyClassType)
+                enemy.takeDamage(modifiedDamage)
                 println("Enemy taking ${this.damage}")
                 ammo--
                 remainingAttackActions--
