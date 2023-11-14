@@ -28,13 +28,25 @@ open class SuperEnemy(health: Int, var damage: Int, var weapon: String, attacks:
     fun attack(enemy : SuperEnemy): Int {
         println("Attacking $attacks times with $weapon")
         var remainingAttackActions = attacks
+        var attacksThisRound = remainingAttackActions
 
-        for(i in 1.. attacks) {
+        for(i in 1.. attacksThisRound) {
             println("attacking, remaining attacks = $remainingAttackActions")
-            if (enemy.alive) {
+            if (enemy.alive && ammo > 0) {
                 enemy.takeDamage(this.damage)
                 println("Enemy taking ${this.damage}")
+                ammo--
                 remainingAttackActions--
+            } else if (ammo == 0) {
+                if (remainingAttackActions < 2) {
+                    return remainingAttackActions
+                } else {
+                    remainingAttackActions -= 2
+                    ammo = attacks
+                    println("Reloading $weapon at cost of two attack actions")
+                    if (remainingAttackActions == 0)
+                        return remainingAttackActions
+                }
             }
             if (!enemy.alive) {
                 println("You killed the enemy")
@@ -96,7 +108,7 @@ class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", 1, -1
     }
 
 fun main() {
-    var pikeman: SuperEnemy = SubPikeman(10, 0)
+    var pikeman: SuperEnemy = SubPikeman(25, 25)
     var pistolero: SuperEnemy = Pistolero(25)
     var bowman : SuperEnemy = SubBowman(25)
 
@@ -109,7 +121,7 @@ fun main() {
 
     var count = 1
     while (pikeman.alive) {
-       println("Remaining attacks after attack $count by Pistolero on Pikeman: ${pistolero.attack(pikeman)}")
+       println("REPORT: Remaining attacks after attack $count by Pistolero on Pikeman: ${pistolero.attack(pikeman)}")
        println(pikeman.health)
        count++
     }
