@@ -109,10 +109,10 @@ class SubPikeman(health: Int, armor: Int) : SuperEnemy(health, 15, "pike", 1, -1
 
 fun main() {
     var pikeman: SuperEnemy = SubPikeman(25, 25)
-    var pistolero: SuperEnemy = Pistolero(25)
+    var pistolero1: SuperEnemy = Pistolero(25)
     var bowman : SuperEnemy = SubBowman(25)
 
-    println(pistolero.alive)
+    println(pistolero1.alive)
 
 /*    while (pistolero.alive) {
         pikeman.attack(pistolero)
@@ -121,7 +121,7 @@ fun main() {
 
     var count = 1
     while (pikeman.alive) {
-       println("REPORT: Remaining attacks after attack $count by Pistolero on Pikeman: ${pistolero.attack(pikeman)}")
+       println("REPORT: Remaining attacks after attack $count by Pistolero on Pikeman: ${pistolero1.attack(pikeman)}")
        println(pikeman.health)
        count++
     }
