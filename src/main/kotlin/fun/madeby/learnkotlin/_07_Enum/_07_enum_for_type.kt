@@ -1,12 +1,14 @@
-//Created by Graham Duthie on 13/11/2023 12:26 -1h
-package `fun`.madeby.learnkotlin.interfacechallenge
-// made up my own interface challenge.. thoughts , Abstract Subclass: Armoured with common takeDamage function?
-// Create special Interface Healer
-// implement it on new class called MonkFighter
-// Use Heal method on Healable classes
-// print message showing healing
+//Created by Graham Duthie on 14/11/2023 13:56 -1h
+package `fun`.madeby.learnkotlin._07_Enum
 
-// Third party can heal them
+import kotlin.math.ceil
+
+enum class EnemyClassType() {
+    HEAVY,
+    LIGHT;
+    open fun isLight() = this == LIGHT
+    open fun isHeavy() = this == HEAVY
+}
 interface Healable {
     fun heal (amount: Int)
 }
@@ -19,7 +21,7 @@ interface Healer {
     fun healOther(other : SuperEnemy1, factor: Int)
 }
 
-abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, attacks: Int, ammo: Int) {
+abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, attacks: Int, ammo: Int, enemyClassType: EnemyClassType) {
     var attacks = 0
     // ammo is a limit to the number of attacks before a reload is required set to -15 for non ammo using
     // characters to provide flexibility for possible specials.
@@ -34,6 +36,7 @@ abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, att
         }
     var alive get() = health > 0
     var isRanged get() = ammo > -1
+    var enemyClassType =  EnemyClassType.LIGHT
 
 
     init{
@@ -43,6 +46,7 @@ abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, att
         this.ammo = ammo
         this.isRanged = ammo > -1
         this.attacks = attacks
+        this.enemyClassType = enemyClassType
     }
 
     fun attack(enemy : SuperEnemy1): Int {
@@ -53,6 +57,7 @@ abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, att
         for(i in 1.. attacksThisRound) {
             println("attacking, remaining attacks = $remainingAttackActions")
             if (enemy.alive && ammo > 0) {
+                var modifiedDamage = modifyDamage(damage, enemy.enemyClassType)
                 enemy.takeDamage(this.damage)
                 println("Enemy taking ${this.damage}")
                 ammo--
@@ -76,6 +81,20 @@ abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, att
         return 0
     }
 
+    // This is created with floats in mind, so percentages are rounded to nearest int for now
+    private fun modifyDamage(damage: Int, enemyClassType: EnemyClassType): Int {
+        val adjustment = damage * 0.1
+        val intAdjustment  =  ceil(adjustment).toInt()
+        println("intAdjustment on damage is: $intAdjustment")
+
+        if (enemyClassType.isHeavy() && this.enemyClassType.isLight())
+            return damage - intAdjustment
+        if (enemyClassType.isLight() && this.enemyClassType.isHeavy())
+            return damage + intAdjustment
+
+        return damage
+    }
+
     open fun takeDamage(damageToTake: Int) {
         println("they took $damageToTake damage")
         health -= damageToTake
@@ -84,7 +103,7 @@ abstract class SuperEnemy1(health: Int, var damage: Int, var weapon: String, att
     abstract fun activateSpecial()
 }
 
-class SubPikeman1(health: Int, armor: Int) : SuperEnemy1(health, 15, "pike", 1, -15), Healable {
+class SubPikeman1(health: Int, armor: Int) : SuperEnemy1(health, 15, "pike", 1, -15, EnemyClassType.HEAVY), Healable {
     var armor = 10
 
     init {
@@ -122,45 +141,45 @@ class SubPikeman1(health: Int, armor: Int) : SuperEnemy1(health, 15, "pike", 1, 
     }
 }
 
-    class MonkFighter(health: Int, armor: Int, baseHealAbility: Int) : SuperEnemy1(health, 15, "cudgel",
-        1, -15), Healer, Healable, SelfHealable{
-        var armor = 10
-        var baseHealAbility = 0
+class MonkFighter(health: Int, armor: Int, baseHealAbility: Int) : SuperEnemy1(health, 15, "cudgel",
+    1, -15, EnemyClassType.HEAVY), Healer, Healable, SelfHealable{
+    var armor = 10
+    var baseHealAbility = 0
 
-        init {
-            println("MonkFighter init()")
-            this.armor = armor
-            this.baseHealAbility = baseHealAbility
+    init {
+        println("MonkFighter init()")
+        this.armor = armor
+        this.baseHealAbility = baseHealAbility
+    }
+
+    override fun takeDamage(damageToTake: Int) {
+        var activeHealth = this.armor + this.health
+        var origHealth = this.health
+        var origArmor = this.armor
+        var adjustedHealth = activeHealth - damageToTake
+
+        println("pre ${this.health}, ${this.armor}")
+        // if armor took damage
+        if (adjustedHealth >= origHealth) {
+            this.armor -= damageToTake
+            println("armour existed post ${this.health}, ${this.armor}")
+            return
+        } else {
+            this.armor = 0
+            this.health -= damageToTake - origArmor
         }
-
-        override fun takeDamage(damageToTake: Int) {
-            var activeHealth = this.armor + this.health
-            var origHealth = this.health
-            var origArmor = this.armor
-            var adjustedHealth = activeHealth - damageToTake
-
-            println("pre ${this.health}, ${this.armor}")
-            // if armor took damage
-            if (adjustedHealth >= origHealth) {
-                this.armor -= damageToTake
-                println("armour existed post ${this.health}, ${this.armor}")
-                return
-            } else {
-                this.armor = 0
-                this.health -= damageToTake - origArmor
-            }
-            println("armour depleted post ${this.health}, ${this.armor}")
+        println("armour depleted post ${this.health}, ${this.armor}")
 
 
-        }
+    }
 
     override fun activateSpecial() {
         TODO("Not yet implemented")
     }
 
-        override fun heal(amount: Int) {
-            TODO("Not yet implemented")
-        }
+    override fun heal(amount: Int) {
+        TODO("Not yet implemented")
+    }
 
     override fun healOther(other : SuperEnemy1, factor: Int) {
         if (other is Healable) {
@@ -168,46 +187,47 @@ class SubPikeman1(health: Int, armor: Int) : SuperEnemy1(health, 15, "pike", 1, 
             other.heal(baseHealAbility * factor)
             println("after healing ${other.javaClass.simpleName} current health = ${other.health}")
         }
-        }
-
-        override fun selfHeal(factor: Int) {
-            health += baseHealAbility * factor
-        }
     }
 
-    class SubBowman1(health: Int) : SuperEnemy1(health, 5, "bow", 5, 5, ) {
-
-        init {
-            println("SubBowman init()")
-        }
-
-        override fun activateSpecial() {
-            TODO("Not yet implemented")
-        }
-
+    override fun selfHeal(factor: Int) {
+        health += baseHealAbility * factor
     }
-    class Pistolero1(health: Int, baseHealAbility: Int) : SuperEnemy1(health, 6, "pistol", 6, 6), SelfHealable, Healable {
-       var baseHealAbility = 0
+}
 
-        init {
-            println("Pistolero init()")
-            this.baseHealAbility = baseHealAbility
-        }
+class SubBowman1(health: Int) : SuperEnemy1(health, 5, "bow", 5, 5, EnemyClassType.LIGHT) {
 
-        override fun activateSpecial() {
-            TODO("Not yet implemented")
-        }
-
-        override fun heal(amount: Int) {
-            if (amount > 0)
-                this.health += amount
-        }
-
-        override fun selfHeal(factor: Int) {
-            this.health += factor * baseHealAbility
-        }
-
+    init {
+        println("SubBowman init()")
     }
+
+    override fun activateSpecial() {
+        TODO("Not yet implemented")
+    }
+
+}
+class Pistolero1(health: Int, baseHealAbility: Int) : SuperEnemy1(health, 6, "pistol", 6, 6
+, EnemyClassType.LIGHT), SelfHealable, Healable {
+    var baseHealAbility = 0
+
+    init {
+        println("Pistolero init()")
+        this.baseHealAbility = baseHealAbility
+    }
+
+    override fun activateSpecial() {
+        TODO("Not yet implemented")
+    }
+
+    override fun heal(amount: Int) {
+        if (amount > 0)
+            this.health += amount
+    }
+
+    override fun selfHeal(factor: Int) {
+        this.health += factor * baseHealAbility
+    }
+
+}
 
 fun main() {
     var pikeman: SuperEnemy1 = SubPikeman1(25, 25)
