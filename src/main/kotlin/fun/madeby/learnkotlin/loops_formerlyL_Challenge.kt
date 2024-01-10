@@ -37,6 +37,18 @@ fun main() {
         return bricks
     }
 
+    fun loopNotIterableWithIndex() {
+
+        // why? without index i counts down from 3
+        for ((index, i) in (0..3).withIndex()) {
+            if (lives <= index) {
+                // do something
+            }
+            // do something
+            }
+        }
+    }
+
 }
 
 
